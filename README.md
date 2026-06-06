@@ -1,32 +1,30 @@
 # ChatGPT Session to CPA / sub2api / Cockpit / 9router / Codex / AxonHub / Codex-Manager
 
-纯前端单页面工具，用来把 ChatGPT Web 登录 session JSON 转换成 CPA、sub2api、Cockpit Tools、9router、Codex auth.json、AxonHub 或 Codex-Manager 可导入 JSON。
+A browser-only single-page tool that converts ChatGPT Web session JSON into importable JSON for CPA, sub2api, Cockpit Tools, 9router, Codex `auth.json`, AxonHub, or Codex-Manager.
 
-## 在线使用
+## Online Use
 
-### [**》》 点我直接使用 《《**](https://gtxx3600.github.io/GPTSession2CPAandSub2API/)
+### [**Open the converter**](https://gtxx3600.github.io/GPTSession2CPAandSub2API/)
 
-## 使用提示
+## Usage Notes
 
-Plus 号可以用此方式导入中转站使用；Free 号的 access token 不能用于调用接口。
+Plus accounts can use this conversion flow for compatible relay tools. Free-account access tokens cannot call GPT model APIs.
 
-本工具可用来解决 Codex OAuth 登录需要绑定手机的问题。Plus 账号通过 Web 登录后的 session 就能生成可导入中转站的账号 JSON 数据；这类数据没有 `refresh_token`，但 `access_token` 有效期通常足够长。
+This tool can help when Codex OAuth sign-in requires phone verification. A Plus account's ChatGPT Web session can be converted into account JSON that relay tools can import. ChatGPT Web sessions usually do not include a `refresh_token`, but the `access_token` lifetime is often long enough for short-term use.
 
-解释一下： plus激活前（free状态）或激活后（plus状态）获取的session在使用上没有区别（free时拿到的session, 激活plus后就可以调模型了），只是账号级别标识有点区别（标识为free or plus），不影响调模型。 换句话讲，不管你啥时候拿到的session, 用本项目转换导入中转站，只要账号当前激活了plus, 就能正常调模型接口。
+Sessions captured before or after a Plus upgrade work the same way for conversion. A session captured while the account was still Free may carry a Free account-level marker, but once the account currently has Plus enabled, the converted account can call supported model APIs through compatible tools.
 
-本工具主要针对 Plus 账号适用，Free 账号即使转换了也没有权限调用 GPT 模型。GoPay 拉闸了，没法每天发 Plus 了；加入 Discord 频道免费获取 GPT 撸羊毛信息，然后配合本工具导入 CPA or Sub2API 使用。
+This tool is primarily intended for Plus accounts. Free accounts may convert successfully, but they still do not have permission to call GPT models. Join the Discord community for GPT account/resource updates and usage tips for importing converted accounts into CPA or sub2api.
 
-## GOAPY 拉闸了， Party is OVER ～ 
-## **加入 Discord 频道免费获取 GPT 撸羊毛信息：**
+## Discord Community
 
-### [**》》 加入 Discord 频道 《《**](https://discord.gg/GFmHY2TZNy)
+### [**Join the Discord community**](https://discord.gg/GFmHY2TZNy)
 
-邀请链接：`https://discord.gg/GFmHY2TZNy`
+Invite link: `https://discord.gg/GFmHY2TZNy`
 
+## Supported Inputs
 
-## 支持输入
-
-支持粘贴或拖入 ChatGPT Web session JSON，例如包含：
+You can paste or drag in ChatGPT Web session JSON, for example data containing:
 
 - `user.email`
 - `accessToken`
@@ -35,33 +33,34 @@ Plus 号可以用此方式导入中转站使用；Free 号的 access token 不�
 - `account.id`
 - `account.planType`
 
-也支持粘贴或拖入 9router Codex OAuth JSON，例如包含 `accessToken`、`refreshToken`、`expiresAt`、`providerSpecificData.chatgptAccountId` 和 `providerSpecificData.chatgptPlanType`。
+You can also paste or drag in 9router Codex OAuth JSON containing fields such as `accessToken`, `refreshToken`, `expiresAt`, `providerSpecificData.chatgptAccountId`, and `providerSpecificData.chatgptPlanType`.
 
-也支持粘贴或拖入 Codex 原生 auth.json，例如包含 `auth_mode`、`OPENAI_API_KEY`、`tokens.access_token`、`tokens.refresh_token`、`tokens.id_token`、`tokens.account_id` 和 `last_refresh`。
+Native Codex `auth.json` input is supported when it contains fields such as `auth_mode`, `OPENAI_API_KEY`, `tokens.access_token`, `tokens.refresh_token`, `tokens.id_token`, `tokens.account_id`, and `last_refresh`.
 
-也支持粘贴或拖入 AxonHub Codex auth.json，例如包含 `tokens.access_token`、`tokens.refresh_token`、`tokens.id_token` 和 `last_refresh`。
+AxonHub Codex `auth.json` input is supported when it contains fields such as `tokens.access_token`, `tokens.refresh_token`, `tokens.id_token`, and `last_refresh`.
 
-也支持粘贴或拖入 Codex-Manager 批量导入 JSON，例如包含 `tokens.access_token`、`tokens.refresh_token`、`tokens.id_token` 和 `meta.label`。
+Codex-Manager batch import JSON is supported when it contains fields such as `tokens.access_token`, `tokens.refresh_token`, `tokens.id_token`, and `meta.label`.
 
-页面也会尝试从 `accessToken` 的 JWT payload 中补充邮箱、账号 ID、用户 ID、计划类型和过期时间。
+The page also attempts to derive email, account ID, user ID, plan type, and expiration time from the `accessToken` JWT payload.
 
-## 输出格式
+## Output Formats
 
-- `CPA`：生成 Codex CPA auth JSON，包含 `type: "codex"`、`access_token`、`session_token`、`id_token`、`email`、`account_id`、套餐和过期时间等字段；缺少真实 `id_token` 时会根据 session 与 access token claims 构造 Codex 可解析的占位 JWT claims。
-- `sub2api`：生成参考 `CPA2sub2API` 项目的 `exported_at/proxies/accounts` 结构，账号平台为 `openai`，类型为 `oauth`；每个账号对象包含 `expires_at` 和 `auto_pause_on_expired`，其中 `expires_at` 来自该账号 access token 的 JWT `exp` 秒级时间戳。
-- `Cockpit`：生成 Cockpit Tools Codex JSON 导入可识别的扁平 token 格式，包含 `id_token`、`access_token`、`refresh_token`、`account_id`、`email`、`expired` 等字段。
-- `9router`：生成 9router Codex OAuth JSON，包含 `accessToken`、`refreshToken`、`expiresAt`、`providerSpecificData`、`provider`、`authType`、`priority`、`isActive`、`createdAt` 和 `updatedAt` 等字段。
-- `Codex`：生成原生 Codex `auth.json`，包含 `auth_mode: "chatgpt"`、`OPENAI_API_KEY: null`、`tokens.id_token/access_token/refresh_token/account_id` 和 `last_refresh`。缺少真实 `refresh_token` 时保留空字符串，access token 过期后不能自动刷新。
-- `AxonHub`：生成 AxonHub Codex auth.json，包含 `auth_mode: "chatgpt"`、`last_refresh` 和 `tokens.access_token/refresh_token/id_token`。缺少真实 `refresh_token` 时会写入 `__missing_refresh_token__` 占位值，方便在 access token 过期前试用；过期后不能自动刷新。
-- `Codex-Manager`：生成 Codex-Manager 批量导入 JSON，包含 `tokens.access_token/refresh_token/id_token` 和 `meta.label/workspace_id/chatgpt_account_id/note`。缺少真实 `refresh_token` 时保留空字符串，避免被 Codex-Manager 误判为可刷新账号。
-ChatGPT Web session 通常不包含 OAuth 文件里常见的 `refresh_token`，因此 access token 过期后不能自动刷新。
+- `CPA`: Generates Codex CPA auth JSON with fields such as `type: "codex"`, `access_token`, `session_token`, `id_token`, `email`, `account_id`, plan, and expiration values. When a real `id_token` is missing, the tool builds placeholder JWT claims that Codex can parse from the session and access token claims.
+- `sub2api`: Generates the `exported_at/proxies/accounts` structure used by the `CPA2sub2API` project. The account platform is `openai`, the type is `oauth`, and each account object includes `expires_at` and `auto_pause_on_expired`. The account-level `expires_at` comes from the access token JWT `exp` Unix timestamp.
+- `Cockpit`: Generates the flat token format recognized by Cockpit Tools Codex JSON import, including `id_token`, `access_token`, `refresh_token`, `account_id`, `email`, and `expired`.
+- `9router`: Generates 9router Codex OAuth JSON with fields such as `accessToken`, `refreshToken`, `expiresAt`, `providerSpecificData`, `provider`, `authType`, `priority`, `isActive`, `createdAt`, and `updatedAt`.
+- `Codex`: Generates native Codex `auth.json` with `auth_mode: "chatgpt"`, `OPENAI_API_KEY: null`, `tokens.id_token/access_token/refresh_token/account_id`, and `last_refresh`. When a real `refresh_token` is missing, the tool keeps an empty string; the access token cannot refresh automatically after it expires.
+- `AxonHub`: Generates AxonHub Codex `auth.json` with `auth_mode: "chatgpt"`, `last_refresh`, and `tokens.access_token/refresh_token/id_token`. When a real `refresh_token` is missing, the tool writes the `__missing_refresh_token__` placeholder for trial use before the access token expires; it cannot refresh automatically after expiration.
+- `Codex-Manager`: Generates Codex-Manager batch import JSON with `tokens.access_token/refresh_token/id_token` and `meta.label/workspace_id/chatgpt_account_id/note`. When a real `refresh_token` is missing, the tool keeps an empty string so Codex-Manager does not mistake the account for a refreshable one.
 
-## 本地使用
+ChatGPT Web sessions usually do not include the OAuth-style `refresh_token`, so access tokens cannot refresh automatically after expiration.
 
-直接打开：
+## Local Use
+
+Open this file directly in a browser:
 
 ```text
 docs/index.html
 ```
 
-所有解析和转换都在浏览器本地完成，不上传 token，不写入本地存储。
+All parsing and conversion happens locally in your browser. Tokens are not uploaded and nothing is written to local storage.
